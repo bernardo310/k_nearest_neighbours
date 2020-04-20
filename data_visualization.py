@@ -13,10 +13,11 @@ import utility_functions as uf
 
 def main():
     """
-        Main function that runs the logistic classification algorithm
+        Main function used for visualization of histograms by columns in csv file
     """
+    #get data
     x_train, y_train, x_testing, y_testing = uf.load_data('diabetes.csv', 1, 100, 0)
-
+    #show histograms
     f1 = plt.figure()
     plt.hist(x_train[:,[0]])
     plt.title('Pregnancies')
