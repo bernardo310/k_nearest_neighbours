@@ -24,7 +24,7 @@ def main():
     x_train, mean, std = uf.scale_data(x_train, flag)
 
     #initialize hyperparameters
-    learning_rate = 0.001
+    learning_rate = 0.0001
     stopping_criteria = 0.01
 
     #initialize w with zeros of size of columns in x data + 1 (w0...wn)
