@@ -1,8 +1,8 @@
 """ 
-    This script containg utility functions used for logistic classification
+    This script containg utility functions used for k nearest neighbours algorithm
     Author : Bernardo Cardenas Domene
     Institution : Universidad de Monterrey
-    First Created : 6/April/2020
+    First Created : 6/May/2020
     Email : bernardo.cardenas@udem.edu
 """
 
@@ -111,84 +111,46 @@ def scale_data(data, flag, mean=0, std=0):
         return scaled_data
 
 
-def eval_hypothesis_function_multivariate(w, x):
+def compute_euclidean_distance(testing_point, x):
     """
-    obtains hypothesis function for multivariate linear regression
+    calculates the ecludian distance between a testing point and x data
     input parameter: 
-        w: numpy array containing w parameters
+        testing_point: numpy type array containing the testing point location. ex [0,0,0]
         x: numpy type array containing x data
     output: 
-        hypothesis: numpy type array containing hypothesis linear function  
+        distance: numpy type array containing disance from x data and testing point per row of x data
     """
-    #apply hypothesis function x.*w to logistic function
-    hypothesis = 1 / (1 + np.exp(np.matmul(x.T, w) * -1) )
-    return hypothesis
+    #calculate squared difference
+    squared_difference = (x - testing_point) ** 2
+    #create empty array to store distances
+    distances = np.zeros((len(squared_difference),1))
+    #calculate square root of sum of squared difference and store in distances array
+    for i in range(len(squared_difference)):
+        dist = math.sqrt(np.sum(squared_difference[i]))
+        distances[i] = dist
+    #return distances
+    return distances
 
+def compute_conditional_probabilities(k, testing_point, x, y):
+    #get distances
+    distances = compute_euclidean_distance(testing_point, x)
+    #attach label to distances (y values)
+    distances_with_label = (np.hstack([distances,y]))
+    #sort ascending based on distances
+    sorted_distances_with_label = distances_with_label[distances_with_label[:,0].argsort()]
+    print(distances_with_label,'\n')
+    print(sorted_distances_with_label)
+    total_classes = np.array([0,0]) #total_classes[0] = true class count,   total_classes[1] = false class count
+    for i in range(0, k):
+        if(sorted_distances_with_label[i][1] == 1): total_classes[0] += 1
+        elif(sorted_distances_with_label[i][1] ==0): total_classes[1] +=1
+    print(total_classes)
+    p_true = 1 / len(y) * total_classes[0]
+    p_false = 1 / len(y) * total_classes[1]
+    return  [p_true, p_false]
+ 
 
-def compute_gradient_of_cost_function_multivariate(hypothesis, x, y, n):
-    """
-    calculates gradient for multivariate linear regression
-    input parameter: 
-        hypothesis: numpy type array containing hypothesis function 
-        x: numpy type array containing x data
-        y: numpy type array containing y data
-        n: integer representing number of rows in x data
-    output: 
-        gradient: gredient array
-    """ 
-    #calculate error
-    error = np.subtract(hypothesis, y)  
-    #calculate gradient
-    gradient = np.matmul(x, error) / n    
-    return gradient
-
-
-def compute_L2_norm_multivariate(gradient):
-    """
-    calculates L2 norm 
-    input parameter: 
-        hypothesis: numpy type array containing gradient of cost function
-    output: 
-        L2: float value for L2 norm
-    """     
-    #calculate l2 norm (Euclidean norm)
-    l2 = np.sqrt(np.sum(gradient**2))
-    return l2
-
-
-def gradient_descent(x, y, w, learning_rate, stopping_criteria):
-    """
-    obtains optimal w parameters using gradient descent algorithm
-    input parameter: 
-        x: numpy type array containing x data
-        y: numpy type array containing y data 
-        w: numpy array where optimal w parameters will be stored
-        learning_rate: float learning rate
-        stopping_criteria: float stopping criteria
-    output: 
-        w: numpy type array containing optimal parameters
-    """
-    #add column of ones to x data. w0 + w1x1 + w2x2 + ... wnxn
-    ones = np.ones((len(x), 1))
-    x = np.hstack((ones, x))
-    x = x.T
-    #calculate number of rows
-    n = len(y)
-    while(1):
-        #calculate hypothesis
-        hypothesis = eval_hypothesis_function_multivariate(w, x) 
-        #calculate gradient
-        gradient = compute_gradient_of_cost_function_multivariate(hypothesis, x, y, n) 
-        #calculate l2 norm
-        l2 = compute_L2_norm_multivariate(gradient) 
-        #apply gradient descent alorithm
-        w = w - learning_rate * gradient  
-        if(l2 < stopping_criteria): #stop if l2 is lower than stopping criteria
-            return w  
-    return
-
-
-def predict(x, w):
+def predict(p):
     """
     predicts y values using w parameters and x testing data
     input parameter: 
@@ -196,20 +158,11 @@ def predict(x, w):
         w: numpy type array containing w parameters
     output: 
         predictions: numpy type array containing y predictions (values are 1 or 0)
-    """
-    #add 1's column to x
-    ones = np.ones((len(x), 1))
-    x = np.hstack((ones, x))
-    #evalutate x testing data with logistic function
-    predictions = 1 / (1 + np.exp(np.matmul(x, w) * -1) )
-    #asign to positive or negative class
-    for i in range(len(predictions)):
-        if(predictions[i] >= 0.5):
-            predictions[i] = 1
-        else:
-            predictions[i] = 0
+    """ 
+    prediction = 0
+    if(p[0] > p[1]): prediction = 1
 
-    return predictions
+    return prediction
 
 
 def get_confusion_matrix(predictions, y):
