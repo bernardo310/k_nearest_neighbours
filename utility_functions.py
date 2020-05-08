@@ -138,19 +138,19 @@ def compute_conditional_probabilities(k, testing_point, x, y):
     distances_with_label = (np.hstack([distances,y]))
     #sort ascending based on distances
     sorted_distances_with_label = distances_with_label[distances_with_label[:,0].argsort()]
-    print(distances_with_label,'\n')
-    print(sorted_distances_with_label)
+    #print(distances_with_label,'\n')
+    #print(sorted_distances_with_label)
     total_classes = np.array([0,0]) #total_classes[0] = true class count,   total_classes[1] = false class count
     for i in range(0, k):
         if(sorted_distances_with_label[i][1] == 1): total_classes[0] += 1
         elif(sorted_distances_with_label[i][1] ==0): total_classes[1] +=1
-    print(total_classes)
+    #print(total_classes)
     p_true = 1 / len(y) * total_classes[0]
     p_false = 1 / len(y) * total_classes[1]
     return  [p_true, p_false]
  
 
-def predict(p):
+def predict(k, x, y):
     """
     predicts y values using w parameters and x testing data
     input parameter: 
@@ -159,9 +159,11 @@ def predict(p):
     output: 
         predictions: numpy type array containing y predictions (values are 1 or 0)
     """ 
-    prediction = 0
-    if(p[0] > p[1]): prediction = 1
-
+    prediction = np.zeros((len(x),1))
+    for i in range(len(x)):
+        p = compute_conditional_probabilities(k, x[i], x, y)
+        if(p[0] > p[1]): prediction[i] = 1
+        
     return prediction
 
 

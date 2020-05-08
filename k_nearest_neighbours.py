@@ -24,29 +24,27 @@ def main():
     x_train, mean, std = uf.scale_data(x_train, flag)
 
     #initialize hyperparameters
-    k = 3
+    k = 5
 
     #run KNN algorithm
     #predictions = uf.k_nearest_neighbours(k, x, y)
 
-    testing_point = np.array([[0.0,4.0,3.0]])
-    x = np.array([[0,3,0],[2,0,0],[0,1,3],[0,1,2],[-1,0,1],[1,1,1]])
-    y = np.array([[0],[0],[0],[1],[1],[1]])
-    p = uf.compute_conditional_probabilities(k, testing_point, x, y)
-    print(uf.predict(p))
+
+    predictions = uf.predict(k, x_train, y_train)
+
     #scale testing data
-   # x_testing = uf.scale_data(x_testing, flag, mean, std)
+    x_testing = uf.scale_data(x_testing, flag, mean, std)
 
 
 
     #predict using testing data
-    #predictions = uf.predict(x_testing, w)
+    predictions = uf.predict(x_testing, w)
 
     #obtain confusion matrix
-    #confusion_matrix = uf.get_confusion_matrix(predictions, y_testing)
+    confusion_matrix = uf.get_confusion_matrix(predictions, y_train)
 
     #print matrix and performance metrics
-    #uf.print_performance_metrics(confusion_matrix)
+    uf.print_performance_metrics(confusion_matrix)
 
     print('Computing time in seconds:', float(time.time() - initial_time))
 
