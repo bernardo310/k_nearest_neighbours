@@ -131,40 +131,58 @@ def compute_euclidean_distance(testing_point, x):
     #return distances
     return distances
 
-def compute_conditional_probabilities(k, testing_point, x, y):
-    #get distances
-    distances = compute_euclidean_distance(testing_point, x)
+def compute_conditional_probabilities(k, testing_point, x_train, y_train):
+    """
+    calculates the contidional probability. In other words, weather a testing point belongs to positive class or negative class by calculating the distance between the testing point and all x data, and selecting the nearest k elements
+    input parameter: 
+        k: int representing k value for number of nearest neighbours to find
+        testing_point: numpy type array containing the testing point location. ex [0,0,0]
+        x_train: numpy type array containing x training data (95% of data)
+        y_train: mumpy type array containing y training data for x training data
+    output: 
+        probability: outcome of probability, 1 if belongs to positive class, 0 if belongs to negative class.
+    """    
+    #get distances of testing point to x training data
+    distances = compute_euclidean_distance(testing_point, x_train)
     #attach label to distances (y values)
-    distances_with_label = (np.hstack([distances,y]))
+    distances_with_label = (np.hstack([distances, y_train]))
     #sort ascending based on distances
     sorted_distances_with_label = distances_with_label[distances_with_label[:,0].argsort()]
-    #print(distances_with_label,'\n')
-    #print(sorted_distances_with_label)
+    #create zero list for storing total number of positive and negative classes found in nearest k elements
     total_classes = np.array([0,0]) #total_classes[0] = true class count,   total_classes[1] = false class count
-    for i in range(0, k):
+    for i in range(k):   #get first k elements and count classes
         if(sorted_distances_with_label[i][1] == 1): total_classes[0] += 1
         elif(sorted_distances_with_label[i][1] ==0): total_classes[1] +=1
-    #print(total_classes)
-    p_true = 1 / len(y) * total_classes[0]
-    p_false = 1 / len(y) * total_classes[1]
-    return  [p_true, p_false]
+    #calculate conditional probabilities
+    p_true = 1 / len(x_train) * total_classes[0]
+    p_false = 1 / len(x_train) * total_classes[1]
+    #determine which is majority
+    probability = 0
+    if(p_true > p_false): probability = 1
+    #return probability
+    return  probability
  
 
-def predict(k, x, y):
+def predict(k, x_train, y_train, x_testing):
     """
-    predicts y values using w parameters and x testing data
+    predicts y values for every x testing using KNN
     input parameter: 
-        x: numpy type array containing x testing data
-        w: numpy type array containing w parameters
+        x_train: numpy type array containing x training data (95% of data)
+        y_train: mumpy type array containing y training data for x training data
+        x_testing: numpy type array containing x testing data (5% of data)
     output: 
         predictions: numpy type array containing y predictions (values are 1 or 0)
     """ 
-    prediction = np.zeros((len(x),1))
-    for i in range(len(x)):
-        p = compute_conditional_probabilities(k, x[i], x, y)
-        if(p[0] > p[1]): prediction[i] = 1
-        
-    return prediction
+    #create zeros list to store predictions
+    predictions = np.zeros((len(x_testing),1))
+    #iterate every x testing element
+    for i in range(len(x_testing)):
+        #calculate conditional probabilities
+        p = compute_conditional_probabilities(k, x_testing[i], x_train, y_train)
+        #save prediction to list
+        predictions[i] = p        
+    #return list of predictions
+    return predictions
 
 
 def get_confusion_matrix(predictions, y):

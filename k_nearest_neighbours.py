@@ -20,28 +20,38 @@ def main():
     flag = 0
     x_train, y_train, x_testing, y_testing = uf.load_data('diabetes.csv', 1, 95, flag)
     
+    #print testing data
+    print('-'*100)
+    print('First 10 Testing Data')
+    print('-'*100)    
+    print('{0: >20}'.format("Pregnancies"),'{0: >20}'.format("Glucose"),'{0: >20}'.format("BloodPressure"),'{0: >20}'.format("SkinThickness"),'{0: >20}'.format("Insulin"),'{0: >20}'.format("BMI"),'{0: >20}'.format("DiabetesPedigreeFunction"),'{0: >20}'.format("Age"))
+    for i in range(len(x_testing)): print('{0: >20}'.format(x_testing[i][0]),'{0: >20}'.format(x_testing[i][1]),'{0: >20}'.format(x_testing[i][2]),'{0: >20}'.format(x_testing[i][3]),'{0: >20}'.format(x_testing[i][4]),'{0: >20}'.format(x_testing[i][5]),'{0: >20}'.format(x_testing[i][6]),'{0: >20}'.format(x_testing[i][7]))
+    print('\n')
+
     #scale training data
     x_train, mean, std = uf.scale_data(x_train, flag)
-
-    #initialize hyperparameters
-    k = 5
-
-    #run KNN algorithm
-    #predictions = uf.k_nearest_neighbours(k, x, y)
-
-
-    predictions = uf.predict(k, x_train, y_train)
 
     #scale testing data
     x_testing = uf.scale_data(x_testing, flag, mean, std)
 
+    #print testing data
+    print('-'*100)
+    print('Scaled Testing Data')
+    print('-'*100)    
+    print('{0: >20}'.format("Pregnancies"),'{0: >20}'.format("Glucose"),'{0: >20}'.format("BloodPressure"),'{0: >20}'.format("SkinThickness"),'{0: >20}'.format("Insulin"),'{0: >20}'.format("BMI"),'{0: >20}'.format("DiabetesPedigreeFunction"),'{0: >20}'.format("Age"))
+    for i in range(len(x_testing)): print('{0: >20}'.format(x_testing[i][0]),'{0: >20}'.format(x_testing[i][1]),'{0: >20}'.format(x_testing[i][2]),'{0: >20}'.format(x_testing[i][3]),'{0: >20}'.format(x_testing[i][4]),'{0: >20}'.format(x_testing[i][5]),'{0: >20}'.format(x_testing[i][6]),'{0: >20}'.format(x_testing[i][7]))
+    print('\n')
 
+    #initialize hyperparameters
+    k = 5
 
-    #predict using testing data
-    predictions = uf.predict(x_testing, w)
+    #run KNN algorithm for testing data and obtain predictions
+    predictions = uf.predict(k, x_train, y_train, x_testing)
 
     #obtain confusion matrix
-    confusion_matrix = uf.get_confusion_matrix(predictions, y_train)
+    confusion_matrix = uf.get_confusion_matrix(predictions, y_testing)
+
+
 
     #print matrix and performance metrics
     uf.print_performance_metrics(confusion_matrix)
