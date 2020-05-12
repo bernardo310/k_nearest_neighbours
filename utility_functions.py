@@ -133,7 +133,7 @@ def compute_euclidean_distance(testing_point, x):
 
 def compute_conditional_probabilities(k, testing_point, x_train, y_train):
     """
-    calculates the contidional probability. In other words, weather a testing point belongs to positive class or negative class by calculating the distance between the testing point and all x data, and selecting the nearest k elements
+    calculates the contidional probability. In other words, whether a testing point belongs to positive class or negative class by calculating the distance between the testing point and all x data, and selecting the nearest k elements
     input parameter: 
         k: int representing k value for number of nearest neighbours to find
         testing_point: numpy type array containing the testing point location. ex [0,0,0]
